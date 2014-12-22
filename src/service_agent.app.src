@@ -1,0 +1,12 @@
+{application, service_agent,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { service_agent_app, []}},
+  {env, []}
+ ]}.
