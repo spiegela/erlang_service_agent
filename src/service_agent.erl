@@ -5,7 +5,7 @@
 -include("service_agent.hrl").
 
 %% API
--export([start_link/0, create/1, delete/1]).
+-export([start_link/0, create/1, delete/1, list/0]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -20,11 +20,11 @@
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-create(Id) ->
-  gen_server:call(?SERVER, {create, Input}).
+create(Instance) ->
+  gen_server:call(?SERVER, {create, Instance}).
 
-delete(Id) ->
-  gen_server:call(?SERVER, {delete, Input}).
+delete(Instance) ->
+  gen_server:call(?SERVER, {delete, Instance}).
 
 list() ->
   gen_server:call(?SERVER, list).
@@ -41,10 +41,10 @@ handle_call({delete, Instance}, _From, State) ->
 handle_call(list, _From, State) ->
     {reply, service_instance:list(), State}.
 
-handle_cast(_Request, State) ->
-  {noreply, State};
 handle_cast(stop, State) ->
-  {stop, normal, State}.
+  {stop, normal, State};
+handle_cast(_Request, State) ->
+  {noreply, State}.
 
 handle_info(_Info, State) ->
   {noreply, State}.

@@ -8,23 +8,24 @@
 -spec list() -> [#instance{}].
 list() -> [ plist_to_rec(P) || P <- process_attrs(process_lines()) ].
 
--spec create(#instance{}) -> ok.
+-spec start(#instance{}) -> ok.
 start(I) ->
-  _Str = os:cmd(cmd(start, I)),
+  _Str = os:cmd(start_cmd(I)),
   ok.
 
--spec delete(#instance{}) -> ok.
-stop(I) ->
+-spec stop(#instance{}) -> ok.
+stop(#instance{name = N}) ->
   B = os:getenv("BIND_ADDR"),
-  N = lists_to_atom(lists:concat([N, "@", B])),
-  rpc:call(N, init, stop, []).
+  A = list_to_atom(lists:concat([N, "@", B])),
+  rpc:call(A, init, stop, []).
 
 %%% Internal functions
 
 %% @priv
--spec start_cmd(#instance{name = N}=I) ->
+-spec start_cmd(#instance{}) -> string().
+start_cmd(#instance{name = N}=I) ->
   Bin = "/var/vcap/packages/service_agent/bin/instance_ctl start",
-  lists:flatten([vars(I), " ", Bin, , " ", N]).
+  lists:flatten([vars(I), " ", Bin, " ", N]).
 
 %% @priv
 -spec vars(#instance{}) -> [string()].
@@ -50,7 +51,7 @@ attr_pair(["setcookie"|Args]) ->
 attr_pair(["kernel", "inet_dist_listen_min"|Args]) ->
   {dist_min, lists:nth(1, Args)};
 attr_pair(["kernel", "inet_dist_listen_max"|Args]) ->
-  {dist_max, lists:nth(1, Args)};
+  {dist_max, lists:nth(1, Args)}.
 
 %% @priv
 apropos_attr([AttrName|_]) ->
@@ -58,7 +59,7 @@ apropos_attr([AttrName|_]) ->
 
 %% @priv
 plist_to_rec(Plist) ->
-  lists:foldl(fun() -> end, #instance{}, Plist).
+  lists:foldl(fun add_to_record/2, #instance{}, Plist).
 
 %% @priv
 add_to_record({name, Name}, Rec) ->
