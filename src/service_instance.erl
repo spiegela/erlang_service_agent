@@ -63,7 +63,7 @@ attr_pairs(ProcLists) ->
 %% @priv
 -spec attr_pair(string_list()) -> service_attr_input().
 attr_pair(["name"|Args]) ->
-  {name, lists:nth(1, Args)};
+  {address, lists:nth(1, Args)};
 attr_pair(["setcookie"|Args]) ->
   {cookie, lists:nth(1, Args)};
 attr_pair(["kernel", "inet_dist_listen_min"|Args]) ->
@@ -85,8 +85,9 @@ plist_to_rec(Plist) ->
 
 %% @priv
 -spec add_to_record(service_attr_input(), #instance{}) -> #instance{}.
-add_to_record({name, Name}, Rec) ->
-  Rec#instance{name = Name};
+add_to_record({address, Address}, Rec) ->
+  [Name, BindAddr] = string:tokens(Address, "@"),
+  Rec#instance{bind_addr = BindAddr, name = Name};
 add_to_record({cookie, Cookie}, Rec) ->
   Rec#instance{cookie = Cookie};
 add_to_record({dist_min, DistMin}, Rec) ->
