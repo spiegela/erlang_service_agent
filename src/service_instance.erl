@@ -9,22 +9,31 @@
 list() -> [ plist_to_rec(P) || P <- process_attrs(process_lines()) ].
 
 -spec start(#instance{}) -> ok.
-start(I) -> _Str = os:cmd(start_cmd(I)), ok.
+start(Inst) -> _Str = os:cmd(start_cmd(Inst)), ok.
 
 -spec stop(#instance{}) -> ok.
-stop(#instance{bind_addr = undefined}=I) ->
-  stop(I#instance{bind_addr = os:getenv("BIND_ADDR")});
-stop(#instance{name = N, bind_addr = B}) ->
-  Address = list_to_atom(lists:concat([N, "@", B])),
-  rpc:call(Address, init, stop, []).
+stop(Inst) -> _Str = os:cmd(stop_cmd(Inst)), ok.
 
 %%% Internal functions
 
 %% @priv
 -spec start_cmd(#instance{}) -> string().
-start_cmd(#instance{name = N}=I) ->
-  Bin = "/var/vcap/packages/service_agent/bin/instance_ctl start",
-  lists:concat([vars(I), " ", Bin, " ", N]).
+start_cmd(Inst) -> cmd(start, Inst).
+
+%% @priv
+-spec stop_cmd(#instance{}) -> string().
+stop_cmd(Inst) -> cmd(stop, Inst).
+
+%% @priv
+-spec cmd(start|stop, #instance{}) -> string().
+cmd(start, #instance{name=N}=I) ->
+  lists:concat([vars(I), " ", bin(), " start ", N]);
+cmd(stop, #instance{name=N}=I) ->
+  lists:concat([vars(I), " ", bin(), " stop ", N]).
+
+%% @priv
+-spec bin() -> string().
+bin() -> "/var/vcap/packages/service_agent/bin/instance_ctl".
 
 %% @priv
 -spec vars(#instance{}) -> nonempty_string().
