@@ -5,41 +5,41 @@
 -include("service_agent.hrl").
 
 %% @doc List running erlang virtual machines
--spec list() -> [#instance{}].
+-spec list() -> [#agent_instance{}].
 list() -> [ plist_to_rec(P) || P <- process_attrs(process_lines()) ].
 
--spec start(#instance{}) -> ok.
+-spec start(#agent_instance{}) -> ok.
 start(Inst) -> _Str = os:cmd(start_cmd(Inst)), ok.
 
--spec stop(#instance{}) -> ok.
+-spec stop(#agent_instance{}) -> ok.
 stop(Inst) -> _Str = os:cmd(stop_cmd(Inst)), ok.
 
 %%% Internal functions
 
 %% @priv
--spec start_cmd(#instance{}) -> string().
+-spec start_cmd(#agent_instance{}) -> string().
 start_cmd(Inst) -> cmd(start, Inst).
 
 %% @priv
--spec stop_cmd(#instance{}) -> string().
+-spec stop_cmd(#agent_instance{}) -> string().
 stop_cmd(Inst) -> cmd(stop, Inst).
 
 %% @priv
--spec cmd(start|stop, #instance{}) -> string().
-cmd(start, #instance{name=N}=I) ->
-  lists:concat([vars(I), " ", bin(), " start ", N]);
-cmd(stop, #instance{name=N}=I) ->
-  lists:concat([vars(I), " ", bin(), " stop ", N]).
+-spec cmd(start|stop, #agent_instance{}) -> string().
+cmd(start, #agent_instance{instance_id = Id}=I) ->
+  lists:concat([vars(I), " ", bin(), " start ", Id]);
+cmd(stop, #agent_instance{instance_id = Id}=I) ->
+  lists:concat([vars(I), " ", bin(), " stop ", Id]).
 
 %% @priv
 -spec bin() -> string().
 bin() -> "/var/vcap/packages/service_agent/bin/instance_ctl".
 
 %% @priv
--spec vars(#instance{}) -> nonempty_string().
-vars(#instance{bind_addr = undefined}=I) ->
-  vars(I#instance{bind_addr = os:getenv("BIND_ADDR")});
-vars(#instance{bind_addr= B, cookie = C, dist_min = I, dist_max = X}) ->
+-spec vars(#agent_instance{}) -> nonempty_string().
+vars(#agent_instance{bind_addr = undefined}=I) ->
+  vars(I#agent_instance{bind_addr = os:getenv("BIND_ADDR")});
+vars(#agent_instance{bind_addr= B, cookie = C, dist_min = I, dist_max = X}) ->
   lists:concat([
     "BIND_ADDR=", B,
     " COOKIE=",   atom_to_list(C),
@@ -88,18 +88,19 @@ apropos_attr([AttrName|_]) ->
   lists:member(AttrName, ["name", "setcookie", "kernel"]).
 
 %% @priv
--spec plist_to_rec(service_attr_list()) -> #instance{}.
+-spec plist_to_rec(service_attr_list()) -> #agent_instance{}.
 plist_to_rec(Plist) ->
-  lists:foldl(fun add_to_record/2, #instance{}, Plist).
+  lists:foldl(fun add_to_record/2, #agent_instance{}, Plist).
 
 %% @priv
--spec add_to_record(service_attr_input(), #instance{}) -> #instance{}.
+-spec add_to_record(service_attr_input(), #agent_instance{}) ->
+  #agent_instance{}.
 add_to_record({address, Address}, Rec) ->
-  [Name, BindAddr] = string:tokens(Address, "@"),
-  Rec#instance{bind_addr = BindAddr, name = Name};
+  [Id, BindAddr] = string:tokens(Address, "@"),
+  Rec#agent_instance{bind_addr = BindAddr, instance_id = Id};
 add_to_record({cookie, Cookie}, Rec) ->
-  Rec#instance{cookie = Cookie};
+  Rec#agent_instance{cookie = Cookie};
 add_to_record({dist_min, DistMin}, Rec) ->
-  Rec#instance{dist_min = DistMin};
+  Rec#agent_instance{dist_min = DistMin};
 add_to_record({dist_max, DistMax}, Rec) ->
-  Rec#instance{dist_max = DistMax}.
+  Rec#agent_instance{dist_max = DistMax}.

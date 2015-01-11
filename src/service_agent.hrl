@@ -4,10 +4,10 @@
 							  }.
 -type service_attr_list() :: [service_attr_input()].
 
--record(instance, {
-    name      :: undefined | atom(),
-    bind_addr :: undefined | string(),
-    cookie    :: undefined | atom(),
-    dist_min  :: undefined | integer(),
-    dist_max  :: undefined | integer()
+-record(agent_instance, {
+    instance_id :: undefined | atom(),
+    bind_addr   :: undefined | string(),
+    cookie      :: undefined | atom(),
+    dist_min    :: undefined | pos_integer(),
+    dist_max    :: undefined | pos_integer()
   }).
