@@ -2,6 +2,7 @@
 -name service_agent@127.0.0.1
 
 ## Cookie for distributed erlang
+## TODO:  Set this randoming during packaging
 -setcookie dce45ae8-190e-495f-9a20-c6437de417d3
 
 ## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
