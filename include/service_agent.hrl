@@ -8,6 +8,6 @@
     instance_id :: undefined | atom() | '_',
     bind_addr   :: undefined | string() | '_',
     cookie      :: undefined | atom() | '_',
-    dist_min    :: undefined | pos_integer() | '_',
+    dist_min    :: undefined | pos_integer() | '_' | '$1',
     dist_max    :: undefined | pos_integer() | '_'
   }).
