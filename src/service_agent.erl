@@ -35,6 +35,7 @@ list() ->
 init([]) ->
   Leader = os:getenv("LEADER"),
   register_agent(Leader),
+  schedule_registration(),
   {ok, #state{leader = Leader}}.
 
 handle_call({create, Instance}, _From, State) ->
@@ -76,11 +77,11 @@ register_agent(LeaderIP) -> registry_action(register, LeaderIP).
 registry_action(_Action, false) ->
   ok;
 registry_action(Action, LeaderIP) ->
-  try
-    rpc:call(broker(LeaderIP), service_agent_registry, Action, [node()], 5000)
-  catch {badrpc, timeout} ->
-    erlang:send_after(?REG_INTERVAL, self(), Action)
-  end.
+    rpc:call(broker(LeaderIP), service_agent_registry, Action, [node()], 5000).
+
+-spec schedule_registration() -> ok.
+schedule_registration() ->
+  erlang:send_after(?REG_INTERVAL, self(), register).
 
 -spec broker(string()) -> atom().
 broker(IP) ->
