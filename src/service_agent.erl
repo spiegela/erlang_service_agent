@@ -12,6 +12,7 @@
          terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
+-define(REG_INTERVAL, 30000).
 
 -record(state, { leader :: string() | false }).
 
@@ -34,7 +35,7 @@ list() ->
 init([]) ->
   Leader = os:getenv("LEADER"),
   register_agent(Leader),
-  {ok, #state{agent = Leader}.
+  {ok, #state{leader = Leader}}.
 
 handle_call({create, Instance}, _From, State) ->
   {reply, service_instance:start(Instance), State};
@@ -48,10 +49,10 @@ handle_cast(stop, State) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info(register, #state{agent = Leader}=State) ->
+handle_info(register, #state{leader = Leader}=State) ->
   register_agent(Leader),
   {noreply, State};
-handle_info(deregister, #state{agent = Leader}=State) ->
+handle_info(deregister, #state{leader = Leader}=State) ->
   deregister_agent(Leader),
   {noreply, State};
 handle_info(_Info, State) ->
@@ -83,4 +84,4 @@ registry_action(Action, LeaderIP) ->
 
 -spec broker(string()) -> atom().
 broker(IP) ->
-  Broker = list_to_atom(lists:concat(["service_broker@", IP])),
+  list_to_atom(lists:concat(["service_broker@", IP])).
