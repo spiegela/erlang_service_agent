@@ -77,7 +77,8 @@ register_agent(LeaderIP) -> registry_action(register, LeaderIP).
 registry_action(_Action, false) ->
   ok;
 registry_action(Action, LeaderIP) ->
-    rpc:call(broker(LeaderIP), service_agent_registry, Action, [node()], 5000).
+  rpc:call(broker(LeaderIP), service_agent_registry, Action, [node()], 5000),
+  erlang:send_after(?REG_INTERVAL, self(), register).
 
 -spec schedule_registration() -> ok.
 schedule_registration() ->
