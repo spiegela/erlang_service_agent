@@ -82,7 +82,7 @@ registry_action(Action, LeaderIP) ->
 
 -spec schedule_registration() -> ok.
 schedule_registration() ->
-  erlang:send_after(?REG_INTERVAL, self(), register).
+  erlang:send(self(), register).
 
 -spec broker(string()) -> atom().
 broker(IP) ->
