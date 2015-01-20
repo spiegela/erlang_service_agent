@@ -7,7 +7,7 @@ set -u # report the usage of uninitialized variables
 
 NODENAME=$2
 
-PATH=/var/vcap/packages/erlang/bin:/var/vcap/bosh/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/var/vcap/packages/service_agent/erts-6.3/bin:$PATH
 LOGFILE=/var/vcap/sys/log/erlang/${NODENAME}.log
 COOKIE_FLAG="-setcookie $COOKIE"
 DIST_FLAG="-kernel inet_dist_listen_min $DIST_MIN -kernel inet_dist_listen_max $DIST_MAX"
@@ -34,4 +34,5 @@ case $1 in
     ;;
 
 esac
+echo ok
 exit 0

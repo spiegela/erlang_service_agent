@@ -9,10 +9,10 @@
 list() -> [ plist_to_rec(P) || P <- process_attrs(process_lines()) ].
 
 -spec start(#agent_instance{}) -> ok.
-start(Inst) -> _Str = os:cmd(start_cmd(Inst)), ok.
+start(Inst) -> "ok\n" = os:cmd(start_cmd(Inst)), ok.
 
 -spec stop(#agent_instance{}) -> ok.
-stop(Inst) -> _Str = os:cmd(stop_cmd(Inst)), ok.
+stop(Inst) -> "ok\n" = os:cmd(stop_cmd(Inst)), ok.
 
 %%% Internal functions
 
@@ -97,10 +97,11 @@ plist_to_rec(Plist) ->
   #agent_instance{}.
 add_to_record({address, Address}, Rec) ->
   [Id, BindAddr] = string:tokens(Address, "@"),
-  Rec#agent_instance{bind_addr = BindAddr, instance_id = Id};
+  Rec#agent_instance{ bind_addr = list_to_atom(BindAddr),
+                      instance_id = list_to_atom(Id) };
 add_to_record({cookie, Cookie}, Rec) ->
-  Rec#agent_instance{cookie = Cookie};
+  Rec#agent_instance{cookie = list_to_atom(Cookie)};
 add_to_record({dist_min, DistMin}, Rec) ->
-  Rec#agent_instance{dist_min = DistMin};
+  Rec#agent_instance{dist_min = list_to_integer(DistMin)};
 add_to_record({dist_max, DistMax}, Rec) ->
-  Rec#agent_instance{dist_max = DistMax}.
+  Rec#agent_instance{dist_max = list_to_integer(DistMax)}.
