@@ -1,6 +1,6 @@
 -module(service_instance).
 
--export([list/0, start/1, stop/1]).
+-export([list/0, get/1, start/1, stop/1]).
 
 -include("service_agent.hrl").
 
@@ -13,6 +13,10 @@ start(Inst) -> "ok\n" = os:cmd(start_cmd(Inst)), ok.
 
 -spec stop(#agent_instance{}) -> ok.
 stop(Inst) -> "ok\n" = os:cmd(stop_cmd(Inst)), ok.
+
+-spec get(#agent_instance{}) -> #agent_instance{}.
+get(#agent_instance{instance_id = Id}) ->
+  lists:keyfind(Id, #agent_instance.instance_id, list()).
 
 %%% Internal functions
 
