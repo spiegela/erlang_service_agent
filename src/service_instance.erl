@@ -60,7 +60,7 @@ process_lines() ->
 %% @priv
 -spec process_words(nonempty_string()) -> [string_list()].
 process_words(ProcLists) ->
-  [ string:tokens(C, " ") || C <- string:tokens(ProcLists, "-") ].
+  [string:tokens(C, " ") || C <- re:split(ProcLists, "\s-", [{return, list}])].
 
 %% @priv
 -spec process_attrs(string_list()) -> [service_attr_list()].
