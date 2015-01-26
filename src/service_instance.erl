@@ -36,7 +36,7 @@ cmd(stop, #agent_instance{instance_id = Id}=I) ->
   lists:concat([vars(I), " ", bin(), " stop ", Id]).
 
 %% @priv
--spec bin() -> string().
+-spec bin() -> [1..255,...].
 bin() -> "/var/vcap/packages/service_agent/bin/instance_ctl".
 
 %% @priv
@@ -86,8 +86,6 @@ attr_pair(["kernel", "inet_dist_listen_max"|Args]) ->
 
 %% @priv
 -spec apropos_attr(string_list()) -> boolean().
-apropos_attr([]) ->
-  false;
 apropos_attr([AttrName|_]) ->
   lists:member(AttrName, ["name", "setcookie", "kernel"]).
 
