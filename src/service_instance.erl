@@ -99,8 +99,7 @@ plist_to_rec(Plist) ->
   #agent_instance{}.
 add_to_record({address, Address}, Rec) ->
   [Id, BindAddr] = string:tokens(Address, "@"),
-  Rec#agent_instance{ bind_addr = list_to_atom(BindAddr),
-                      instance_id = list_to_atom(Id) };
+  Rec#agent_instance{bind_addr = BindAddr, instance_id = list_to_atom(Id)};
 add_to_record({cookie, Cookie}, Rec) ->
   Rec#agent_instance{cookie = list_to_atom(Cookie)};
 add_to_record({dist_min, DistMin}, Rec) ->
